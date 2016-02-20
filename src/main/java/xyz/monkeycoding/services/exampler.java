@@ -46,7 +46,7 @@ public class Exampler {
             }
         }
 
-        logger.info("-----------------Document-----------------------");
+        logger.info("-----------------Document----------------------");
         Document doc = Jsoup.parse(EntityUtils.toString(response.getEntity()));
 
         Elements elements = doc.select("#main_content div .post");
