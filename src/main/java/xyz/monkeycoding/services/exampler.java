@@ -18,9 +18,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-/**
- * Created by mx on 16/2/13.
- */
 public class Exampler {
 
     private static final Logger logger = LoggerFactory.getLogger(Exampler.class);
@@ -28,46 +25,39 @@ public class Exampler {
     public static void main(String[] args) throws Exception {
         CloseableHttpClient httpClient = HttpClients.createDefault();
 
-        try {
+        CookieStore cookieStore = new BasicCookieStore();
 
-            CookieStore cookieStore = new BasicCookieStore();
+        HttpClientContext localContext = HttpClientContext.create();
+        localContext.setCookieStore(cookieStore);
 
-            HttpClientContext localContext = HttpClientContext.create();
-            localContext.setCookieStore(cookieStore);
+        HttpGet httpGet = new HttpGet("http://ifeve.com/java-concurrency-constructs/");
+        logger.info("Executing request " + httpGet.getRequestLine());
 
-            HttpGet httpGet = new HttpGet("http://ifeve.com/java-concurrency-constructs/");
-            logger.info("Executing request " + httpGet.getRequestLine());
+        CloseableHttpResponse response = httpClient.execute(httpGet, localContext);
+        logger.info("-----------------Cookie-----------------------");
+        logger.info(response.getStatusLine().toString());
 
-            CloseableHttpResponse response = httpClient.execute(httpGet, localContext);
-            try {
-                logger.info("-----------------Cookie-----------------------");
-                logger.info(response.getStatusLine().toString());
-
-                List<Cookie> cookies = cookieStore.getCookies();
-                if (cookies.isEmpty()) {
-                    logger.info("Cookie None");
-                } else {
-                    for (int i = 0; i < cookies.size(); i++) {
-                        logger.info("- " + cookies.get(i));
-                    }
-                }
-
-                logger.info("-----------------Document-----------------------");
-                Document doc = Jsoup.parse(EntityUtils.toString(response.getEntity()));
-
-                Elements elements = doc.select("#main_content div .post");
-                Element ele = elements.select(".title span").get(0);
-
-                System.out.println(ele.text());
-
-                Element eleCont = elements.select(".post_content").get(0);
-                System.out.println(eleCont.html());
-
-            } finally {
-                response.close();
+        List<Cookie> cookies = cookieStore.getCookies();
+        if (cookies.isEmpty()) {
+            logger.info("Cookie None");
+        } else {
+            for (Cookie cookie : cookies) {
+                logger.info("- " + cookie);
             }
-        } finally {
-            httpClient.close();
         }
+
+        logger.info("-----------------Document-----------------------");
+        Document doc = Jsoup.parse(EntityUtils.toString(response.getEntity()));
+
+        Elements elements = doc.select("#main_content div .post");
+        Element ele = elements.select(".title span").get(0);
+
+        System.out.println(ele.text());
+
+        Element eleCont = elements.select(".post_content").get(0);
+        System.out.println(eleCont.html());
+
+        response.close();
+        httpClient.close();
     }
 }
