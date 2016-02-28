@@ -1,8 +1,5 @@
 package reflection;
 
-import sun.jvm.hotspot.debugger.dummy.DummyDebugger;
-import sun.reflect.generics.scope.DummyScope;
-
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
